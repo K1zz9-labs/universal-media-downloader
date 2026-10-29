@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Universal Media Downloader</title>
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --border: #e2e8f0;
+    }
+
+    body {
+      width: 420px;
+      max-height: 600px;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 14px;
+      background: var(--bg-color);
+      color: var(--text-main);
+      box-sizing: border-box;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .counter-badge {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .top-toolbar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .select-date {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-sort {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-sort:hover, .select-date:hover { background: #f1f5f9; }
+
+    .controls {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-filter {
+      background: #e2e8f0;
+      color: var(--text-muted);
+      flex: 1;
+    }
+    .btn-filter.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-zip {
+      background: var(--success);
+      color: #fff;
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 10px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+    }
+    .btn-zip:hover { background: #059669; }
+    .btn-zip:disabled { background: #94a3b8; cursor: wait; }
+
+    #media-list {
+      max-height: 300px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    .date-group-header {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin: 6px 0 2px 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .date-group-header::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .media-item {
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      gap: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .media-item:hover { border-color: #cbd5e1; }
+
+    .preview {
+      width: 46px;
+      height: 46px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #f1f5f9;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: var(--text-muted);
+    }
+
+    .info {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+
+    .filename {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #334155;
+    }
+
+    .badge-container {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+      align-items: center;
+    }
+
+    .badge {
+      font-size: 10px;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .dl-btn {
+      background: #eff6ff;
+      color: var(--primary);
+      padding: 6px 10px;
+      border-radius: 6px;
+      min-width: 34px;
+    }
+    .dl-btn:hover { background: var(--primary); color: #fff; }
+    .dl-btn:disabled { background: #e2e8f0; color: #94a3b8; cursor: wait; }
+
+    .empty {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 30px 0;
+      font-size: 13px;
+    }
+
+    .settings {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .settings label.toggle {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      flex: 1 1 100%;
+    }
+    .settings select, .settings input[type="number"] {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 11px;
+      padding: 4px 6px;
+      background: #fff;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+    .settings input[type="number"] { width: 58px; }
+    .settings select:disabled, .settings input:disabled { opacity: .5; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h3>📥 Менеджер медиа <span id="counter" class="counter-badge">0</span></h3>
+  </header>
+
+  <div class="top-toolbar">
+    <select id="date-select" class="select-date">
+      <option value="all">📅 Все даты</option>
+    </select>
+    <button id="sort-btn" class="btn-sort" title="Сортировка по дате">Сначала новые ↓</button>
+  </div>
+  
+  <div class="settings">
+    <label class="toggle"><input type="checkbox" id="opt-resize"> Фото в квадрат без обрезки (поля по краям)</label>
+    <span>Размер</span>
+    <input type="number" id="opt-size" min="16" max="5000" step="1" value="700">
+    <span>px</span>
+    <select id="opt-format">
+      <option value="jpeg">JPG 100%</option>
+      <option value="png">PNG без потерь</option>
+    </select>
+    <select id="opt-bg">
+      <option value="white">Фон белый</option>
+      <option value="black">Фон чёрный</option>
+      <option value="transparent">Прозрачный (PNG)</option>
+    </select>
+  </div>
+
+  <div class="controls">
+    <button class="btn-filter active" data-filter="all">Все</button>
+    <button class="btn-filter" data-filter="image">Фото</button>
+    <button class="btn-filter" data-filter="video">Видео</button>
+  </div>
+
+  <button id="download-zip" class="btn-zip" disabled>📦 Скачать всё в ZIP архиве</button>
+
+  <div id="media-list">
+    <div class="empty">Сканирование страницы...</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
